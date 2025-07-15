@@ -1,0 +1,90 @@
+#[derive(Debug)]
+pub enum Token {
+    VarDeclaration(String),
+    VarName(String),
+    Operator(String),
+    FunctionCall(String),
+    Argument(String),
+    String(String),
+    Number(String),
+    // TODO: add more
+    Unknown(String),
+}
+
+#[derive(Debug)]
+struct ParsingStatus {
+    in_string: bool,
+    in_parens: bool,
+    after_assignment: bool,
+    token_start: usize,
+    token_end: usize,
+}
+
+/// using a String containing the code and a list of delimiters, return an Abstract Syntax Tree as a vector of Tokens
+pub fn split_tokens(code: String, delimiters: &[&str]) -> Vec<Token> {
+    let mut abstract_syntax_tree = Vec::<Token>::new();
+    let mut parsing_status = ParsingStatus {
+        in_string: false,
+        in_parens: false,
+        after_assignment: false,
+        token_start: 0,
+        token_end: 0,
+    };
+    let chars: Vec<char> = code.chars().collect();
+    for (i, character) in chars.iter().enumerate() {
+        parsing_status.token_end = i;
+
+        if should_split(*character, &code, &parsing_status, delimiters) {
+            let token = (&code[parsing_status.token_start..parsing_status.token_end + 1]).trim();
+            println!("{}",token);
+            if token != "" {
+                abstract_syntax_tree.push(get_token_type(token, &parsing_status));
+            }
+            if *character == '=' {
+                parsing_status.after_assignment = true;
+            }
+            parsing_status.token_start = i + 1;
+        }
+
+        if *character == '\"' {
+            parsing_status.in_string = !parsing_status.in_string;
+        }
+    }
+
+    abstract_syntax_tree
+}
+
+/// return whether or not to split tokens after the next character
+fn should_split(
+    subtoken: char,
+    code: &String,
+    context: &ParsingStatus,
+    delimiters: &[&str],
+) -> bool {
+    if !context.in_string && delimiters.contains(&subtoken.to_string().as_str()) {
+        // println!("<---{}", subtoken);
+        return true;
+    }
+    if context.in_string && subtoken == '\"' {
+        // println!("<---{}", subtoken);
+        return true;
+    }
+    if context.token_end >= code.len() {
+        // println!("<---{}", subtoken);
+        return true;
+    }
+    // println!("--->{}", subtoken);
+    return false;
+}
+
+/// return what type of token should be used based on current parsing context and the value of the token
+fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
+    let token_val = token_val.to_string();
+    if context.in_string {
+        return Token::String(token_val);
+    } else if ["+","=","-","*","/"].contains(&&token_val[..]) {
+        return Token::Operator(token_val);
+    }
+    // TODO: identify tokens
+    return Token::Unknown(token_val);
+}

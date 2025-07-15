@@ -7,7 +7,7 @@ fn main() {
     file.read_to_string(&mut code).expect("failed to read file");
     println!("{}",code);
     println!("from mod: ");
-    let token_delims = ["=", "\n", " ", "\t", ";", ","];
+    let token_delims = ["\n", " ", "\t", ";", ","];
     let ast = tokenizer::tokenizer::split_tokens(code, &token_delims);
     println!("{:#?}", ast);
 }

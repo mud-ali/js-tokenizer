@@ -1,6 +1,3 @@
-let g = b + 2;
-const c = "hi";
-var b = 12;
-function z() {
-    b = 13;
-}
+var b = 12; 
+let g = b + 2; 
+const c = "hi"; 

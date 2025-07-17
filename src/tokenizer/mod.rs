@@ -7,6 +7,7 @@ pub enum Token {
     Argument(String),
     String(String),
     Number(String),
+    ExpressionEnd,
     // TODO: add more
     Unknown(String),
 }
@@ -36,21 +37,31 @@ pub fn split_tokens(code: String, delimiters: &[&str]) -> Vec<Token> {
     for (i, character) in chars.iter().enumerate() {
         parsing_status.token_end = i;
 
+        if *character == '\"' {
+            parsing_status.in_string = !parsing_status.in_string;
+            if !parsing_status.in_string {
+                continue;
+            }
+        }
+
         if should_split(*character, &code, &parsing_status, delimiters) {
+
             let token = (&code[parsing_status.token_start..parsing_status.token_end]).trim();
             println!("{}", token);
             if token != "" {
                 abstract_syntax_tree.push(get_token_type(token, &parsing_status));
                 parsing_status.last_token = abstract_syntax_tree.last().unwrap().clone();
             }
-            if *character == '=' {
-                parsing_status.after_assignment = true;
-            }
-            parsing_status.token_start = i + 1;
-        }
 
-        if *character == '\"' {
-            parsing_status.in_string = !parsing_status.in_string;
+            if token == "=" {
+                parsing_status.after_assignment = true;
+            } 
+
+            if matches!(parsing_status.last_token, Token::ExpressionEnd) {
+                parsing_status.after_assignment = false;
+            }
+            
+            parsing_status.token_start = i;
         }
     }
 
@@ -84,8 +95,8 @@ fn should_split(
 
 /// return what type of token should be used based on current parsing context and the value of the token
 fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
-    if context.in_string {
-        return Token::String((&token_val[1..]).to_string());
+    if token_val.chars().nth(0) == Some('"') && token_val.chars().last() == Some('"') {
+        return Token::String((&token_val[1..token_val.len()-1]).to_string());
     }
 
     let token_val = token_val.to_string();
@@ -111,6 +122,16 @@ fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
             return Token::FunctionCall(token_val);
         }
         return Token::VarName(token_val);
+    }
+    
+    if token_val == ";" {
+        return Token::ExpressionEnd;
+    }
+
+    if context.after_assignment {
+        return Token::VarName(token_val);
+    } else {
+        println!("before = {}",token_val);
     }
 
     return Token::Unknown(token_val);

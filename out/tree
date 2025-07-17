@@ -1,5 +1,18 @@
 [
     VarDeclaration(
+        "var",
+    ),
+    VarName(
+        "b",
+    ),
+    Operator(
+        "=",
+    ),
+    Number(
+        "12",
+    ),
+    ExpressionEnd,
+    VarDeclaration(
         "let",
     ),
     VarName(
@@ -29,19 +42,6 @@
     ),
     String(
         "hi",
-    ),
-    ExpressionEnd,
-    VarDeclaration(
-        "var",
-    ),
-    VarName(
-        "b",
-    ),
-    Operator(
-        "=",
-    ),
-    Number(
-        "12",
     ),
     ExpressionEnd,
 ]

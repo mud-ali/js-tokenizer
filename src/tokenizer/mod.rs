@@ -46,7 +46,7 @@ pub fn split_tokens(code: String, delimiters: &[&str]) -> Vec<Token> {
 
         if should_split(*character, &code, &parsing_status, delimiters) {
             let token = (&code[parsing_status.token_start..parsing_status.token_end]).trim();
-            println!("{}", token);
+            // println!("{}", token);
             if token != "" {
                 abstract_syntax_tree.push(get_token_type(token, &parsing_status));
                 parsing_status.last_token = abstract_syntax_tree.last().unwrap().clone();
@@ -132,8 +132,6 @@ fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
 
     if context.after_assignment {
         return Token::VarName(token_val);
-    } else {
-        println!("before = {}", token_val);
     }
 
     return Token::Unknown(token_val);

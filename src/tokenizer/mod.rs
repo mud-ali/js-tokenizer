@@ -45,7 +45,6 @@ pub fn split_tokens(code: String, delimiters: &[&str]) -> Vec<Token> {
         }
 
         if should_split(*character, &code, &parsing_status, delimiters) {
-
             let token = (&code[parsing_status.token_start..parsing_status.token_end]).trim();
             println!("{}", token);
             if token != "" {
@@ -55,17 +54,20 @@ pub fn split_tokens(code: String, delimiters: &[&str]) -> Vec<Token> {
 
             if token == "=" {
                 parsing_status.after_assignment = true;
-            } 
+            }
 
             if matches!(parsing_status.last_token, Token::ExpressionEnd) {
                 parsing_status.after_assignment = false;
             }
-            
+
             parsing_status.token_start = i;
         }
     }
 
-    abstract_syntax_tree.push(get_token_type(&code[parsing_status.token_end..], &parsing_status));
+    abstract_syntax_tree.push(get_token_type(
+        &code[parsing_status.token_end..],
+        &parsing_status,
+    ));
 
     abstract_syntax_tree
 }
@@ -96,7 +98,7 @@ fn should_split(
 /// return what type of token should be used based on current parsing context and the value of the token
 fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
     if token_val.chars().nth(0) == Some('"') && token_val.chars().last() == Some('"') {
-        return Token::String((&token_val[1..token_val.len()-1]).to_string());
+        return Token::String((&token_val[1..token_val.len() - 1]).to_string());
     }
 
     let token_val = token_val.to_string();
@@ -123,7 +125,7 @@ fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
         }
         return Token::VarName(token_val);
     }
-    
+
     if token_val == ";" {
         return Token::ExpressionEnd;
     }
@@ -131,7 +133,7 @@ fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
     if context.after_assignment {
         return Token::VarName(token_val);
     } else {
-        println!("before = {}",token_val);
+        println!("before = {}", token_val);
     }
 
     return Token::Unknown(token_val);

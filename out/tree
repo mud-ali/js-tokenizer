@@ -13,6 +13,24 @@
     ),
     ExpressionEnd,
     VarDeclaration(
+        "function",
+    ),
+    FunctionCall(
+        "a",
+    ),
+    Paren(
+        "(",
+    ),
+    Unknown(
+        "b",
+    ),
+    Paren(
+        ")",
+    ),
+    ScopeDefiner(
+        "{",
+    ),
+    VarDeclaration(
         "let",
     ),
     VarName(
@@ -32,16 +50,51 @@
     ),
     ExpressionEnd,
     VarDeclaration(
-        "const",
+        "let",
     ),
     VarName(
-        "c",
+        "y",
     ),
     Operator(
         "=",
     ),
     String(
-        "hi",
+        "e",
+    ),
+    ExpressionEnd,
+    ScopeDefiner(
+        "{",
+    ),
+    VarDeclaration(
+        "var",
+    ),
+    VarName(
+        "e",
+    ),
+    Operator(
+        "=",
+    ),
+    String(
+        "y",
+    ),
+    ExpressionEnd,
+    ScopeDefiner(
+        "}",
+    ),
+    ScopeDefiner(
+        "}",
+    ),
+    VarDeclaration(
+        "let",
+    ),
+    VarName(
+        "x",
+    ),
+    Operator(
+        "=",
+    ),
+    Number(
+        "1",
     ),
     ExpressionEnd,
 ]

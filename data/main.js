@@ -1,3 +1,9 @@
 var b = 12; 
-let g = b + 2; 
-const c = "hi"; 
+function a(b) {
+    let g = b + 2;
+    let y = "e";
+    {
+        var e = "y";
+    }
+}
+let x = 1;

@@ -8,6 +8,8 @@ pub enum Token {
     String(String),
     Number(String),
     ExpressionEnd,
+    ScopeDefiner(String),
+    Paren(String),
     // TODO: add more
     Unknown(String),
 }
@@ -42,11 +44,15 @@ pub fn split_tokens(code: String, delimiters: &[&str]) -> Vec<Token> {
             if !parsing_status.in_string {
                 continue;
             }
+        } else if *character == '(' {
+            parsing_status.in_parens = true;
+        } else if *character == ')' {
+            parsing_status.in_parens = false;
         }
 
         if should_split(*character, &code, &parsing_status, delimiters) {
             let token = (&code[parsing_status.token_start..parsing_status.token_end]).trim();
-            // println!("{}", token);
+            //println!("--|-->{}", token);
             if token != "" {
                 abstract_syntax_tree.push(get_token_type(token, &parsing_status));
                 parsing_status.last_token = abstract_syntax_tree.last().unwrap().clone();
@@ -80,18 +86,29 @@ fn should_split(
     delimiters: &[&str],
 ) -> bool {
     if !context.in_string && delimiters.contains(&subtoken.to_string().as_str()) {
-        // println!("<---{}", subtoken);
+        //println!("<----({})", subtoken);
         return true;
     }
     if context.in_string && subtoken == '\"' {
-        // println!("<---{}", subtoken);
+        //println!("<---{}", subtoken);
         return true;
     }
+
+    if code
+        .chars()
+        .nth(context.token_start)
+        .expect("expected token start")
+        == '('
+    {
+        return true;
+    }
+
     if context.token_end > code.len() {
-        // println!("<---{}", subtoken);
+        //println!("<---{}", subtoken);
         return true;
     }
-    // println!("--->{}", subtoken);
+
+    //println!("--->{}==>", subtoken);
     return false;
 }
 
@@ -102,6 +119,12 @@ fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
     }
 
     let token_val = token_val.to_string();
+
+    if ["(", ")", "[", "]"].contains(&&token_val[..]) {
+        return Token::Paren(token_val);
+    } else if ["{", "}"].contains(&&token_val[..]) {
+        return Token::ScopeDefiner(token_val);
+    }
 
     if ["+", "=", "-", "*", "/"].contains(&&token_val[..]) {
         return Token::Operator(token_val);
@@ -132,6 +155,10 @@ fn get_token_type(token_val: &str, context: &ParsingStatus) -> Token {
 
     if context.after_assignment {
         return Token::VarName(token_val);
+    }
+
+    if context.in_parens {
+        return Token::Argument(token_val);
     }
 
     return Token::Unknown(token_val);

@@ -2,36 +2,32 @@ use crate::tokenizer::Token;
 use colored::{ColoredString, Colorize};
 
 pub fn highlight(syntax_tree: Vec<Token>) -> Vec<ColoredString> {
-    let mut output = Vec::new();
-    for token in syntax_tree {
-        if matches!(token, Token::VarDeclaration(_)) {
-            let Token::VarDeclaration(ref token_val) = token else {
-                continue;
-            };
-            output.push(token_val.blue());
-        } else if matches!(token, Token::VarName(_)) {
-            let Token::VarName(ref token_val) = token else {
-                continue;
-            };
-            output.push(token_val.purple());
-        } else if matches!(token, Token::Operator(_)) {
-            let Token::Operator(ref token_val) = token else {
-                continue;
-            };
-            output.push(token_val.white());
-        } else if matches!(token, Token::ExpressionEnd) {
-            output.push(";\n".white());
-        } else if matches!(token, Token::Number(_)) {
-            let Token::Number(ref token_val) = token else {
-                continue;
-            };
-            output.push(token_val.red());
-        } else if matches!(token, Token::String(_)) {
-            let Token::String(ref token_val) = token else {
-                continue;
-            };
-            output.push(format!("\"{}\"", token_val).green());
-        }
-    }
-    return output;
+    let mut indentation = String::new();
+    let single_indent = "    ";
+    syntax_tree
+        .into_iter()
+        .map(|token| {
+            match token {
+                Token::VarDeclaration(val) => format!("{}{}", indentation, val).blue(),
+                Token::VarName(val) => val.purple(),
+                Token::Operator(val) => val.white(),
+                Token::Number(val) => val.red(),
+                Token::String(val) => format!("\"{}\"", val).green(),
+                Token::ExpressionEnd => ";\n".white(),
+                Token::Argument(val) => val.white(),
+                Token::FunctionCall(val) => format!("{}{}", indentation, val).white(),
+                Token::Unknown(val) => val.white(),
+                Token::Paren(val) => val.blue(),
+                Token::ScopeDefiner(val) => {
+                    if val == "{" {
+                        let colored = format!("\n{} {{\n",indentation).green();
+                        indentation += single_indent;
+                        return colored;
+                    }
+                    indentation.truncate(indentation.len() - single_indent.len());
+                    format!("{}}}\n", indentation).green()
+                }
+            }
+        })
+        .collect()
 }

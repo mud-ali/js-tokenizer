@@ -17,6 +17,14 @@ cargo run # to run once
 cargo build --release # compile a production executable
 ```
 
+Create a file in `data/main.js` and run the executable.
+
+```sh
+mkdir data
+echo "var b = 12;" > data/main.js
+./tokenizer
+```
+
 # Using as a crate
 
 To use this as a crate, you can reference the library from its git URL. More information on this can be found in [the cargo documentation](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#specifying-dependencies-from-git-repositories).

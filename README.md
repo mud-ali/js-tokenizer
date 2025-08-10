@@ -2,7 +2,7 @@
 
 a highly unoptimized / inefficient attempt at tokenizing JavaScript with a proof-of-concept syntax-highlighter that uses this module.
 
-# Building / Running standalone
+# Building
 
 Simply clone this repository and use `cargo` to run or build the project. 
 
@@ -17,11 +17,16 @@ cargo run # to run once
 cargo build --release # compile a production executable
 ```
 
+# Usage
+
 Create a file in `data/main.js` and run the executable.
 
 ```sh
+# create the data subdirectory 
 mkdir data
+# add some javascript code
 echo "var b = 12;" > data/main.js
+# run the tokenizer executable
 ./tokenizer
 ```
 
